@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Optional; // Nuevo para manejar resultados que podrian ser nulos
+import java.io.File;
+import java.io.FileWriter; // Para generar boletas
 
 public class TeatroMoro {
 // Todos mis arraylist y hashmaps van aqui
@@ -108,7 +110,7 @@ public class TeatroMoro {
                     edad = Integer.parseInt(scanner.nextLine());
                     if (edad <= 0 || edad > 150) {
                         System.out.println("Edad invalida.");
-                        continue;
+                        continue;               
                     }
                 } catch (NumberFormatException e) {
                     System.out.println("Debe ingresar un numero.");
@@ -176,35 +178,78 @@ if (asientos == null) {
             }
 
             // Aplicar descuento
-            double descuento = 0;
-            String mensajeDescuento = "";
-            if (tipoTarifa.equalsIgnoreCase("Estudiante") && edad >= 60) {
-                System.out.println("Usted califica para dos descuentos: \n1. 10% estudiante, \n2. 15% tercera edad");
-                System.out.print("Seleccione descuento (1 o 2): ");
-                String opcion = scanner.nextLine();
-                if (opcion.equals("1")) {
-                    descuento = precio * 0.10;
-                    mensajeDescuento = "10% estudiante";
+                double descuento = 0;
+                String mensajeDescuento = "";
+                ArrayList<String> descuentosPosibles = new ArrayList<>();
+
+                System.out.print("Ingrese su genero (M/F/No aplica): ");
+                String genero = scanner.nextLine();
+
+                // Detectar descuentos posibles
+                if (edad < 12) descuentosPosibles.add("Nino 5%");
+                if (genero.equalsIgnoreCase("F")) descuentosPosibles.add("Mujer 7%");
+                if (tipoTarifa.equalsIgnoreCase("Estudiante")) descuentosPosibles.add("Estudiante 25%");
+                if (edad >= 60) descuentosPosibles.add("Tercera edad 30%");
+
+                // Aplicar descuento
+                if (descuentosPosibles.size() == 0) {
+                    mensajeDescuento = "Sin descuento";
+                    descuento = 0;
+                } else if (descuentosPosibles.size() == 1) {
+                    mensajeDescuento = descuentosPosibles.get(0);
+                    descuento = switch (mensajeDescuento) {
+                        case "Nino 5%" -> precio * 0.05;
+                        case "Mujer 7%" -> precio * 0.07;
+                        case "Estudiante 25%" -> precio * 0.25;
+                        case "Tercera edad 30%" -> precio * 0.30;
+                        default -> 0;
+                    };
                 } else {
-                    descuento = precio * 0.15;
-                    mensajeDescuento = "15% tercera edad";
+                    // En caso de aplicar a mas descuentos, se puede elegir
+                    System.out.println("Usted califica para varios descuentos:");
+                    for (int e = 0; e < descuentosPosibles.size(); e++) {
+                        System.out.println((e + 1) + ". " + descuentosPosibles.get(e));
+                    }
+
+                    System.out.print("Seleccione el descuento a aplicar (numero): ");
+                    int opcionDescuento = 0;
+                    try {
+                        opcionDescuento = Integer.parseInt(scanner.nextLine()) - 1;
+                        if (opcionDescuento < 0 || opcionDescuento >= descuentosPosibles.size()) {
+                            System.out.println("Opción invalida. Se aplicara el primer descuento.");
+                            opcionDescuento = 0;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Entrada invalida. Se aplicara el primer descuento.");
+                        opcionDescuento = 0;
+                    }
+
+                    mensajeDescuento = descuentosPosibles.get(opcionDescuento);
+                    descuento = switch (mensajeDescuento) {
+                        case "Niño 5%" -> precio * 0.05;
+                        case "Mujer 7%" -> precio * 0.07;
+                        case "Estudiante 25%" -> precio * 0.25;
+                        case "Tercera edad 30%" -> precio * 0.30;
+                        default -> 0;
+                    };
                 }
-            } else if (tipoTarifa.equalsIgnoreCase("Estudiante")) {
-                descuento = precio * 0.10;
-                mensajeDescuento = "10% estudiante";
-            } else if (edad >= 60) {
-                descuento = precio * 0.15;
-                mensajeDescuento = "15% tercera edad";
-            } else {
-                mensajeDescuento = "Sin descuento";
-            }
-
-            double totalPagar = precio - descuento;
-            System.out.println("Descuento aplicado: " + mensajeDescuento);
-            System.out.println("Total a pagar: $" + (int) totalPagar);
-
             System.out.print("Ingrese su nombre: ");
-            String nombreCliente = scanner.nextLine();
+                        String nombreCliente = scanner.nextLine();
+                        
+                double totalPagar = precio - descuento;
+                System.out.println("Descuento aplicado: " + mensajeDescuento);
+                System.out.println("Total a pagar: $" + (int) totalPagar);
+                
+                // Imprimir boleta
+                System.out.println("\n===== BOLETA TEATRO MORO =====");
+                System.out.println("Cliente: " + nombreCliente);
+                System.out.println("Tipo de entrada: " + tipoEntrada);
+                System.out.println("Tarifa: " + tipoTarifa);
+                System.out.println("Asiento: F" + (filaSeleccionada + 1) + " C" + (columnaSeleccionada + 1));
+                System.out.println("Descuento aplicado: " + mensajeDescuento);
+                System.out.println("Total a pagar: $" + (int) totalPagar);
+                System.out.println("===============================");
+                
 
             Optional<Cliente> clienteExistente = clientes.stream()
                 .filter(c -> c.nombre.equalsIgnoreCase(nombreCliente))
@@ -252,6 +297,35 @@ if (asientos == null) {
             for (int i = 0; i < entradasTemporal.size(); i++) {
                 Entrada entrada = entradasTemporal.get(i);
                 Asiento asiento = asientosReservados.get(i);
+                
+                // Crear carpeta "Boletas" si no existe
+                    File carpetaBoletas = new File("Boletas");
+                    if (!carpetaBoletas.exists()) {
+                        carpetaBoletas.mkdir();
+                    }
+
+                    // Crear archivo de boleta individual
+                    try {
+                        String nombreArchivo = "Boleta_" + entrada.getClienteNombre().replaceAll("\\s+", "_") + "_Entrada" + (i + 1) + ".txt";
+                        File archivoBoleta = new File(carpetaBoletas, nombreArchivo);
+                        FileWriter writer = new FileWriter(archivoBoleta);
+
+                        writer.write("===== BOLETA TEATRO MORO =====\n");
+                        writer.write("Cliente: " + entrada.getClienteNombre() + "\n");
+                        writer.write("Tipo de entrada: " + entrada.getTipoEntrada() + "\n");
+                        writer.write("Tarifa: " + entrada.getTipoTarifa() + "\n");
+                        writer.write("Edad: " + entrada.getEdad() + "\n");
+                        writer.write("Asiento: F" + asiento.getFila() + " C" + asiento.getColumna() + "\n");
+                        writer.write("Descuento aplicado: $" + (int) entrada.descuento + "\n");
+                        writer.write("Total a pagar: $" + (int) entrada.total + "\n");
+                        writer.write("===============================\n");
+
+                        writer.close();
+                        System.out.println("Boleta generada en carpeta Boletas: " + nombreArchivo);
+
+                    } catch (Exception e) {  //En caso de que falle
+                        System.out.println("Error al generar boleta: " + e.getMessage());
+                    }
 
                 EntradasVendidas.add(entrada);
                 TotalEntradasVendidas++;
