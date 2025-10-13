@@ -1,0 +1,10 @@
+===== BOLETA TEATRO MORO =====
+ID Venta: 2
+Cliente: Mauricio
+Tipo de entrada: Palcos
+Tarifa: general
+Edad: 45
+Asiento: F2 C4
+Descuento aplicado: $0
+Total a pagar: $11000
+===============================

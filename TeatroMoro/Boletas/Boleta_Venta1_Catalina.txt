@@ -1,0 +1,10 @@
+===== BOLETA TEATRO MORO =====
+ID Venta: 1
+Cliente: Catalina
+Tipo de entrada: Palcos
+Tarifa: estudiante
+Edad: 87
+Asiento: F2 C3
+Descuento aplicado: $1500
+Total a pagar: $3500
+===============================

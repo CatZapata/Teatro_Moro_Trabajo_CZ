@@ -612,7 +612,7 @@ public class TeatroMoro {
                 System.out.print("Ingrese nueva edad: ");
                 try {
                     int nuevaEdad = Integer.parseInt(scanner.nextLine());
-                    if (nuevaEdad <= 0 || nuevaEdad > 150) {
+                    if (nuevaEdad <= 0 || nuevaEdad > 120) {
                         System.out.println("Edad invalida.");
                         return;
                     }
