@@ -4,15 +4,14 @@
  */
 package teatromoro;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.Optional; // Nuevo para manejar resultados que podrian ser nulos
 import java.io.File;
 import java.io.FileWriter; // Para generar boletas
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner; 
 
 public class TeatroMoro {
-// Todos mis arraylist y hashmaps van aqui
+    // Todos mis arraylist y hashmaps van aqui
     static ArrayList<Entrada> EntradasVendidas = new ArrayList<>();
     static HashMap<String, Asiento[][]> asientosPorTipo = new HashMap<>();
 
@@ -41,7 +40,7 @@ public class TeatroMoro {
             asientosPorTipo.put(tipo, asientos);
         }
 
-// Menu
+        // Menu
         while (!salir) {
             System.out.println("\n--- Menu Teatro Moro ---");
             System.out.println("1. Comprar entrada");
@@ -110,7 +109,7 @@ public class TeatroMoro {
                     edad = Integer.parseInt(scanner.nextLine());
                     if (edad <= 0 || edad > 150) {
                         System.out.println("Edad invalida.");
-                        continue;               
+                        continue;
                     }
                 } catch (NumberFormatException e) {
                     System.out.println("Debe ingresar un numero.");
@@ -132,20 +131,19 @@ public class TeatroMoro {
 
             // Mostrar asientos disponibles
             System.out.println("\nSeleccione un asiento disponible:");
-            // Ignora mayusculas minusculas 
-                Asiento[][] asientos = null;
-                for (String key : asientosPorTipo.keySet()) {
+            Asiento[][] asientos = null;
+            for (String key : asientosPorTipo.keySet()) {
                 if (key.equalsIgnoreCase(tipoEntrada)) {
-                asientos = asientosPorTipo.get(key);
-                tipoEntrada = key; 
-                break;
-    }
-}
+                    asientos = asientosPorTipo.get(key);
+                    tipoEntrada = key;
+                    break;
+                }
+            }
 
-if (asientos == null) {
-    System.out.println("Tipo de entrada invalido.");
-    continue; 
-}
+            if (asientos == null) {
+                System.out.println("Tipo de entrada invalido.");
+                continue;
+            }
 
             mostrarAsientos(asientos);
 
@@ -153,136 +151,122 @@ if (asientos == null) {
             int filaSeleccionada = 0, columnaSeleccionada = 0;
 
             while (!asientoValido) {
-    try {
-        System.out.print("Seleccione fila (1-5): ");
-        filaSeleccionada = Integer.parseInt(scanner.nextLine()) - 1;
-        System.out.print("Seleccione columna (1-5): ");
-        columnaSeleccionada = Integer.parseInt(scanner.nextLine()) - 1;
+                try {
+                    System.out.print("Seleccione fila (1-5): ");
+                    filaSeleccionada = Integer.parseInt(scanner.nextLine()) - 1;
+                    System.out.print("Seleccione columna (1-5): ");
+                    columnaSeleccionada = Integer.parseInt(scanner.nextLine()) - 1;
 
-        if(filaSeleccionada < 0 || filaSeleccionada >= 5 || columnaSeleccionada < 0 || columnaSeleccionada >= 5) {
-            System.out.println("Fila o columna invalida.");
-            continue;
-        }
+                    if (filaSeleccionada < 0 || filaSeleccionada >= 5 || columnaSeleccionada < 0 || columnaSeleccionada >= 5) {
+                        System.out.println("Fila o columna invalida.");
+                        continue;
+                    }
 
-        if (asientos[filaSeleccionada][columnaSeleccionada].getEstado().equals("Disponible")) {
-            asientoValido = true;
-            asientos[filaSeleccionada][columnaSeleccionada].setEstado("Reservado");
-            asientosReservados.add(asientos[filaSeleccionada][columnaSeleccionada]);
-        } else {
-            System.out.println("Asiento ocupado, elija otro.");
-        }
+                    if (asientos[filaSeleccionada][columnaSeleccionada].getEstado().equals("Disponible")) {
+                        asientoValido = true;
+                        asientos[filaSeleccionada][columnaSeleccionada].setEstado("Reservado");
+                        asientosReservados.add(asientos[filaSeleccionada][columnaSeleccionada]);
+                    } else {
+                        System.out.println("Asiento ocupado, elija otro.");
+                    }
 
-    } catch(NumberFormatException e) {
-        System.out.println("Debe ingresar numeros validos.");
+                } catch (NumberFormatException e) {
+                    System.out.println("Debe ingresar numeros validos.");
                 }
             }
 
             // Aplicar descuento
-                double descuento = 0;
-                String mensajeDescuento = "";
-                ArrayList<String> descuentosPosibles = new ArrayList<>();
+            double descuento = 0;
+            String mensajeDescuento = "";
+            ArrayList<String> descuentosPosibles = new ArrayList<>();
 
-                System.out.print("Ingrese su genero (M/F/No aplica): ");
-                String genero = scanner.nextLine();
+            System.out.print("Ingrese su genero (M/F/No aplica): ");
+            String genero = scanner.nextLine();
 
-                // Detectar descuentos posibles
-                if (edad < 12) descuentosPosibles.add("Nino 5%");
-                if (genero.equalsIgnoreCase("F")) descuentosPosibles.add("Mujer 7%");
-                if (tipoTarifa.equalsIgnoreCase("Estudiante")) descuentosPosibles.add("Estudiante 25%");
-                if (edad >= 60) descuentosPosibles.add("Tercera edad 30%");
+            // Detectar descuentos posibles
+            if (edad < 12) descuentosPosibles.add("Nino 5%");
+            if (genero.equalsIgnoreCase("F")) descuentosPosibles.add("Mujer 7%");
+            if (tipoTarifa.equalsIgnoreCase("Estudiante")) descuentosPosibles.add("Estudiante 25%");
+            if (edad >= 60) descuentosPosibles.add("Tercera edad 30%");
 
-                // Aplicar descuento
-                if (descuentosPosibles.size() == 0) {
-                    mensajeDescuento = "Sin descuento";
-                    descuento = 0;
-                } else if (descuentosPosibles.size() == 1) {
-                    mensajeDescuento = descuentosPosibles.get(0);
-                    descuento = switch (mensajeDescuento) {
-                        case "Nino 5%" -> precio * 0.05;
-                        case "Mujer 7%" -> precio * 0.07;
-                        case "Estudiante 25%" -> precio * 0.25;
-                        case "Tercera edad 30%" -> precio * 0.30;
-                        default -> 0;
-                    };
-                } else {
-                    // En caso de aplicar a mas descuentos, se puede elegir
-                    System.out.println("Usted califica para varios descuentos:");
-                    for (int e = 0; e < descuentosPosibles.size(); e++) {
-                        System.out.println((e + 1) + ". " + descuentosPosibles.get(e));
-                    }
+            // Aplicar descuento
+            if (descuentosPosibles.isEmpty()) {
+                mensajeDescuento = "Sin descuento";
+                descuento = 0;
+            } else if (descuentosPosibles.size() == 1) {
+                mensajeDescuento = descuentosPosibles.get(0);
+                descuento = switch (mensajeDescuento) {
+                    case "Nino 5%" -> precio * 0.05;
+                    case "Mujer 7%" -> precio * 0.07;
+                    case "Estudiante 25%" -> precio * 0.25;
+                    case "Tercera edad 30%" -> precio * 0.30;
+                    default -> 0;
+                };
+            } else {
+                System.out.println("Usted califica para varios descuentos:");
+                for (int e = 0; e < descuentosPosibles.size(); e++) {
+                    System.out.println((e + 1) + ". " + descuentosPosibles.get(e));
+                }
 
-                    System.out.print("Seleccione el descuento a aplicar (numero): ");
-                    int opcionDescuento = 0;
-                    try {
-                        opcionDescuento = Integer.parseInt(scanner.nextLine()) - 1;
-                        if (opcionDescuento < 0 || opcionDescuento >= descuentosPosibles.size()) {
-                            System.out.println("Opción invalida. Se aplicara el primer descuento.");
-                            opcionDescuento = 0;
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Entrada invalida. Se aplicara el primer descuento.");
+                System.out.print("Seleccione el descuento a aplicar (numero): ");
+                int opcionDescuento;
+                try {
+                    opcionDescuento = Integer.parseInt(scanner.nextLine()) - 1;
+                    if (opcionDescuento < 0 || opcionDescuento >= descuentosPosibles.size()) {
+                        System.out.println("Opción invalida. Se aplicara el primer descuento.");
                         opcionDescuento = 0;
                     }
-
-                    mensajeDescuento = descuentosPosibles.get(opcionDescuento);
-                    descuento = switch (mensajeDescuento) {
-                        case "Niño 5%" -> precio * 0.05;
-                        case "Mujer 7%" -> precio * 0.07;
-                        case "Estudiante 25%" -> precio * 0.25;
-                        case "Tercera edad 30%" -> precio * 0.30;
-                        default -> 0;
-                    };
+                } catch (NumberFormatException e) {
+                    System.out.println("Entrada invalida. Se aplicara el primer descuento.");
+                    opcionDescuento = 0;
                 }
-            System.out.print("Ingrese su nombre: ");
-                        String nombreCliente = scanner.nextLine();
-                        
-                double totalPagar = precio - descuento;
-                System.out.println("Descuento aplicado: " + mensajeDescuento);
-                System.out.println("Total a pagar: $" + (int) totalPagar);
-                
-                // Imprimir boleta
-                System.out.println("\n===== BOLETA TEATRO MORO =====");
-                System.out.println("Cliente: " + nombreCliente);
-                System.out.println("Tipo de entrada: " + tipoEntrada);
-                System.out.println("Tarifa: " + tipoTarifa);
-                System.out.println("Asiento: F" + (filaSeleccionada + 1) + " C" + (columnaSeleccionada + 1));
-                System.out.println("Descuento aplicado: " + mensajeDescuento);
-                System.out.println("Total a pagar: $" + (int) totalPagar);
-                System.out.println("===============================");
-                
 
-            Optional<Cliente> clienteExistente = clientes.stream()
-                .filter(c -> c.nombre.equalsIgnoreCase(nombreCliente))
-                .findFirst();
-            Cliente cliente;
-            if(clienteExistente.isPresent()) {
-                cliente = clienteExistente.get();
-            } else {
-                cliente = new Cliente(nombreCliente, edad, tipoTarifa);
-                clientes.add(cliente);
-}
+                mensajeDescuento = descuentosPosibles.get(opcionDescuento);
+                descuento = switch (mensajeDescuento) {
+                    case "Nino 5%" -> precio * 0.05;
+                    case "Mujer 7%" -> precio * 0.07;
+                    case "Estudiante 25%" -> precio * 0.25;
+                    case "Tercera edad 30%" -> precio * 0.30;
+                    default -> 0;
+                };
+            }
+            System.out.print("Ingrese su nombre: ");
+            String nombreCliente = scanner.nextLine();
+
+            double totalPagar = precio - descuento;
+            System.out.println("Descuento aplicado: " + mensajeDescuento);
+            System.out.println("Total a pagar: $" + (int) totalPagar);
+
+            System.out.println("\n===== BOLETA TEATRO MORO =====");
+            System.out.println("Cliente: " + nombreCliente);
+            System.out.println("Tipo de entrada: " + tipoEntrada);
+            System.out.println("Tarifa: " + tipoTarifa);
+            System.out.println("Asiento: F" + (filaSeleccionada + 1) + " C" + (columnaSeleccionada + 1));
+            System.out.println("Descuento aplicado: " + mensajeDescuento);
+            System.out.println("Total a pagar: $" + (int) totalPagar);
+            System.out.println("===============================");
+
+            // --- LÓGICA CORREGIDA ---
+            // Siempre creamos un nuevo cliente para cada entrada, garantizando que cada venta sea única.
+            Cliente cliente = new Cliente(nombreCliente, edad, tipoTarifa);
+            clientes.add(cliente);
 
             int idVenta = siguienteIdVenta++;
             Asiento asientoSeleccionado = asientos[filaSeleccionada][columnaSeleccionada];
+
+            // Crear la venta con su cliente y asiento únicos
             Venta venta = new Venta(idVenta, cliente, asientoSeleccionado, precio, descuento, totalPagar);
             ventasPorId.put(idVenta, venta);
 
             // Asociar al primer evento de ejemplo
-            if (eventos.isEmpty()) eventos.add(new Evento(1, "Obra principal"));
-            Evento evento = eventos.get(0);
-
-            // Verifica primero si el asiento ya esta asociado a otra venta
-            if (evento.contieneVenta(asientoSeleccionado)) {
-                System.out.println("Error: El asiento ya esta asociado a otra venta.");
-                continue;
+            if (eventos.isEmpty()) {
+                eventos.add(new Evento(1, "Obra principal"));
             }
-
-            // Solo si esta disponible procede a la venta
+            Evento evento = eventos.get(0);
             evento.ventas.add(venta);
 
-
-            // Guardar entrada
-            Entrada entrada = new Entrada(tipoEntrada, tipoTarifa, edad, precio, descuento, totalPagar, nombreCliente);
+            // Guardar entrada, pasando el idVenta único.
+            Entrada entrada = new Entrada(idVenta, tipoEntrada, tipoTarifa, edad, precio, descuento, totalPagar, nombreCliente);
             entradasTemporal.add(entrada);
 
         }
@@ -297,35 +281,36 @@ if (asientos == null) {
             for (int i = 0; i < entradasTemporal.size(); i++) {
                 Entrada entrada = entradasTemporal.get(i);
                 Asiento asiento = asientosReservados.get(i);
-                
+
                 // Crear carpeta "Boletas" si no existe
-                    File carpetaBoletas = new File("Boletas");
-                    if (!carpetaBoletas.exists()) {
-                        carpetaBoletas.mkdir();
-                    }
+                File carpetaBoletas = new File("Boletas");
+                if (!carpetaBoletas.exists()) {
+                    carpetaBoletas.mkdir();
+                }
 
-                    // Crear archivo de boleta individual
-                    try {
-                        String nombreArchivo = "Boleta_" + entrada.getClienteNombre().replaceAll("\\s+", "_") + "_Entrada" + (i + 1) + ".txt";
-                        File archivoBoleta = new File(carpetaBoletas, nombreArchivo);
-                        FileWriter writer = new FileWriter(archivoBoleta);
+                // Crear archivo de boleta individual
+                try {
+                    String nombreArchivo = "Boleta_Venta" + entrada.getIdVenta() + "_" + entrada.getClienteNombre().replaceAll("\\s+", "_") + ".txt";
+                    File archivoBoleta = new File(carpetaBoletas, nombreArchivo);
+                    FileWriter writer = new FileWriter(archivoBoleta);
 
-                        writer.write("===== BOLETA TEATRO MORO =====\n");
-                        writer.write("Cliente: " + entrada.getClienteNombre() + "\n");
-                        writer.write("Tipo de entrada: " + entrada.getTipoEntrada() + "\n");
-                        writer.write("Tarifa: " + entrada.getTipoTarifa() + "\n");
-                        writer.write("Edad: " + entrada.getEdad() + "\n");
-                        writer.write("Asiento: F" + asiento.getFila() + " C" + asiento.getColumna() + "\n");
-                        writer.write("Descuento aplicado: $" + (int) entrada.descuento + "\n");
-                        writer.write("Total a pagar: $" + (int) entrada.total + "\n");
-                        writer.write("===============================\n");
+                    writer.write("===== BOLETA TEATRO MORO =====\n");
+                    writer.write("ID Venta: " + entrada.getIdVenta() + "\n");
+                    writer.write("Cliente: " + entrada.getClienteNombre() + "\n");
+                    writer.write("Tipo de entrada: " + entrada.getTipoEntrada() + "\n");
+                    writer.write("Tarifa: " + entrada.getTipoTarifa() + "\n");
+                    writer.write("Edad: " + entrada.getEdad() + "\n");
+                    writer.write("Asiento: F" + asiento.getFila() + " C" + asiento.getColumna() + "\n");
+                    writer.write("Descuento aplicado: $" + (int) entrada.descuento + "\n");
+                    writer.write("Total a pagar: $" + (int) entrada.total + "\n");
+                    writer.write("===============================\n");
 
-                        writer.close();
-                        System.out.println("Boleta generada en carpeta Boletas: " + nombreArchivo);
+                    writer.close();
+                    System.out.println("Boleta generada en carpeta Boletas: " + nombreArchivo);
 
-                    } catch (Exception e) {  //En caso de que falle
-                        System.out.println("Error al generar boleta: " + e.getMessage());
-                    }
+                } catch (Exception e) {
+                    System.out.println("Error al generar boleta: " + e.getMessage());
+                }
 
                 EntradasVendidas.add(entrada);
                 TotalEntradasVendidas++;
@@ -362,7 +347,7 @@ if (asientos == null) {
         for (int c = 1; c <= asientos[0].length; c++) System.out.print("C" + c + " ");
         System.out.println();
         for (int f = 0; f < asientos.length; f++) {
-            System.out.print("F" + (f + 1) + " ");
+            System.out.print("F" + (f + 1) + "  ");
             for (int c = 0; c < asientos[f].length; c++) {
                 String estado = switch (asientos[f][c].getEstado()) {
                     case "Disponible" -> "D";
@@ -385,7 +370,7 @@ if (asientos == null) {
         System.out.println("Total recaudado: $" + (int) TotalIngresos);
     }
 
-  
+
     public static void mostrarEntradasVendidas() {
         System.out.println("\n--- Resumen de Entradas Vendidas ---");
 
@@ -399,11 +384,27 @@ if (asientos == null) {
         double totalVIP = 0, totalPlateaBaja = 0, totalPlateaAlta = 0, totalPalcos = 0;
 
         for (Entrada e : EntradasVendidas) {
-            switch(e.getTipoEntrada().toLowerCase()) {
-                case "vip" -> { vip++; if (e.descuento>0) vipDesc++; totalVIP += e.total; }
-                case "platea baja" -> { plateaBaja++; if(e.descuento>0) plateaBajaDesc++; totalPlateaBaja+=e.total;}
-                case "platea alta" -> { plateaAlta++; if(e.descuento>0) plateaAltaDesc++; totalPlateaAlta+=e.total;}
-                case "palcos" -> { palcos++; if(e.descuento>0) palcosDesc++; totalPalcos+=e.total;}
+            switch (e.getTipoEntrada().toLowerCase()) {
+                case "vip" -> {
+                    vip++;
+                    if (e.descuento > 0) vipDesc++;
+                    totalVIP += e.total;
+                }
+                case "platea baja" -> {
+                    plateaBaja++;
+                    if (e.descuento > 0) plateaBajaDesc++;
+                    totalPlateaBaja += e.total;
+                }
+                case "platea alta" -> {
+                    plateaAlta++;
+                    if (e.descuento > 0) plateaAltaDesc++;
+                    totalPlateaAlta += e.total;
+                }
+                case "palcos" -> {
+                    palcos++;
+                    if (e.descuento > 0) palcosDesc++;
+                    totalPalcos += e.total;
+                }
             }
         }
 
@@ -412,232 +413,230 @@ if (asientos == null) {
         System.out.printf("Platea alta: %d vendidas, %d con descuento, total recaudado $%.0f\n", plateaAlta, plateaAltaDesc, totalPlateaAlta);
         System.out.printf("Palcos: %d vendidas, %d con descuento, total recaudado $%.0f\n", palcos, palcosDesc, totalPalcos);
     }
-            //Eliminar entradas
-             public static void eliminarEntrada(Scanner scanner) {
-                System.out.println("\n--- Estado actual de entradas por tipo ---");
-                for (String tipo : asientosPorTipo.keySet()) {
-                    System.out.println("\n--- Asientos " + tipo + " ---");
-                    mostrarAsientos(asientosPorTipo.get(tipo));
-                }
 
-                System.out.print("\nIngrese el tipo de entrada de la que desea eliminar (VIP, Platea baja, Platea alta, Palcos): ");
-                String tipoEntrada = scanner.nextLine();
-
-                Asiento[][] asientos = null;
-                for (String key : asientosPorTipo.keySet()) {
-                    if (key.equalsIgnoreCase(tipoEntrada)) {
-                        asientos = asientosPorTipo.get(key);
-                        tipoEntrada = key; 
-                        break;
-                    }
-                }
-
-                if (asientos == null) {
-                    System.out.println("Tipo de entrada invalido.");
-                    return;
-                }
-
-                // Mostrar solo los asientos vendidos
-                System.out.println("\nAsientos vendidos de tipo " + tipoEntrada + ":");
-                boolean hayVendidos = false;
-                for (int f = 0; f < asientos.length; f++) {
-                    for (int c = 0; c < asientos[f].length; c++) {
-                        if (asientos[f][c].getEstado().equals("Vendido")) {
-                            System.out.println("Fila " + (f+1) + ", Columna " + (c+1));
-                            hayVendidos = true;
-                        }
-                    }
-                }
-
-    if (!hayVendidos) {
-        System.out.println("No hay entradas vendidas de este tipo.");
-        return;
-    }
-
-    // Pedir fila y columna a eliminar
-    int filaEliminar = 0, colEliminar = 0;
-    try {
-        System.out.print("Ingrese fila del asiento a eliminar: ");
-        filaEliminar = Integer.parseInt(scanner.nextLine()) - 1;
-        System.out.print("Ingrese columna del asiento a eliminar: ");
-        colEliminar = Integer.parseInt(scanner.nextLine()) - 1;
-    } catch (NumberFormatException e) {
-        System.out.println("Debe ingresar numeros validos.");
-        return;
-    }
-
-    if (filaEliminar < 0 || filaEliminar >= 5 || colEliminar < 0 || colEliminar >= 5) {
-        System.out.println("Fila o columna invalida.");
-        return;
-    }
-
-    if (!asientos[filaEliminar][colEliminar].getEstado().equals("Vendido")) {
-        System.out.println("Ese asiento no esta vendido.");
-        return;
-    }
-
-    // Buscar la venta correspondiente
-    Venta ventaEliminar = null;
-    Evento evento = eventos.get(0);
-    for (Venta v : evento.ventas) {
-        if (v.asiento == asientos[filaEliminar][colEliminar]) {
-            ventaEliminar = v;
-            break;
+    //Eliminar entradas
+    public static void eliminarEntrada(Scanner scanner) {
+        System.out.println("\n--- Estado actual de entradas por tipo ---");
+        for (String tipo : asientosPorTipo.keySet()) {
+            System.out.println("\n--- Asientos " + tipo + " ---");
+            mostrarAsientos(asientosPorTipo.get(tipo));
         }
-    }
 
-    if (ventaEliminar != null) {
-        ventasPorId.remove(ventaEliminar.idVenta);
-        evento.eliminarVenta(ventaEliminar);
-        clientes.remove(ventaEliminar.cliente);
-    }
+        System.out.print("\nIngrese el tipo de entrada de la que desea eliminar (VIP, Platea baja, Platea alta, Palcos): ");
+        String tipoEntrada = scanner.nextLine();
 
-    // Actualizar la lista de entradas vendidas
-    for (int i = 0; i < EntradasVendidas.size(); i++) {
-        Entrada e = EntradasVendidas.get(i);
-        if (e.getTipoEntrada().equalsIgnoreCase(tipoEntrada) && 
-            asientos[filaEliminar][colEliminar].getEstado().equals("Vendido")) {
-            EntradasVendidas.remove(i);
-            TotalEntradasVendidas--;
-            TotalIngresos -= e.total;
-            break;
+        Asiento[][] asientos = null;
+        for (String key : asientosPorTipo.keySet()) {
+            if (key.equalsIgnoreCase(tipoEntrada)) {
+                asientos = asientosPorTipo.get(key);
+                tipoEntrada = key;
+                break;
+            }
         }
-    }
 
-    // Liberar el asiento
-    asientos[filaEliminar][colEliminar].setEstado("Disponible");
-    System.out.println("Entrada eliminada y asiento liberado correctamente.");
- }
- 
- public static void editarEntrada(Scanner scanner) {
-    if (EntradasVendidas.isEmpty()) {
-        System.out.println("No hay entradas para editar.");
-        return;
-    }
-
-    System.out.println("\n--- Entradas disponibles para editar ---");
-    for (int i = 0; i < EntradasVendidas.size(); i++) {
-        Entrada e = EntradasVendidas.get(i);
-        System.out.println((i + 1) + ". Tipo: " + e.getTipoEntrada() + ", Tarifa: " + e.getTipoTarifa() + ", Edad: " + e.getEdad() + ", Total: $" + (int)e.total);
-    }
-
-    System.out.print("Seleccione el numero de la entrada a editar: ");
-    int index;
-    try {
-        index = Integer.parseInt(scanner.nextLine()) - 1;
-        if (index < 0 || index >= EntradasVendidas.size()) {
-            System.out.println("Entrada invalida.");
+        if (asientos == null) {
+            System.out.println("Tipo de entrada invalido.");
             return;
         }
-    } catch (NumberFormatException e) {
-        System.out.println("Debe ingresar un numero valido.");
-        return;
-    }
 
-    Entrada entrada = EntradasVendidas.get(index);
-    Asiento[][] asientos = asientosPorTipo.get(entrada.getTipoEntrada());
-    Asiento asientoActual = null;
-
-    // Buscar el asiento correspondiente en ventas
-    Evento evento = eventos.get(0);
-    Venta venta = null;
-    for (Venta v : evento.ventas) {
-    if (v.cliente.nombre.equalsIgnoreCase(entrada.getClienteNombre())) {
-        venta = v;
-        asientoActual = v.asiento;
-        break;
-    }
-}
-
-
-    if (venta == null || asientoActual == null) {
-        System.out.println("No se encontro la venta asociada a esta entrada.");
-        return;
-    }
-
-    // Opciones de edicion
-    System.out.println("\nSeleccione que desea modificar:");
-    System.out.println("1. Asiento");
-    System.out.println("2. Tarifa");
-    System.out.println("3. Edad");
-    System.out.print("Opcion: ");
-    String opcion = scanner.nextLine();
-
-    switch (opcion) {
-        case "1":
-            mostrarAsientos(asientos);
-            int fila = -1, col = -1;
-            boolean valido = false;
-            while (!valido) {
-                try {
-                    System.out.print("Fila (1-5): ");
-                    fila = Integer.parseInt(scanner.nextLine()) - 1;
-                    System.out.print("Columna (1-5): ");
-                    col = Integer.parseInt(scanner.nextLine()) - 1;
-
-                    if (fila < 0 || fila >= 5 || col < 0 || col >= 5) {
-                        System.out.println("Fila o columna invalida.");
-                        continue;
-                    }
-
-                    if (asientos[fila][col].getEstado().equals("Disponible")) {
-                        valido = true;
-                        // Liberar asiento antiguo
-                        asientoActual.setEstado("Disponible");
-                        // Reservar asiento nuevo
-                        asientos[fila][col].setEstado("Vendido");
-                        venta.asiento = asientos[fila][col];
-                        System.out.println("Asiento modificado correctamente.");
-                    } else {
-                        System.out.println("Asiento ocupado, elija otro.");
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Debe ingresar numeros validos.");
+        // Mostrar solo los asientos vendidos para facilitar la selección
+        System.out.println("\nAsientos vendidos de tipo " + tipoEntrada + ":");
+        boolean hayVendidos = false;
+        for (int f = 0; f < asientos.length; f++) {
+            for (int c = 0; c < asientos[f].length; c++) {
+                if (asientos[f][c].getEstado().equals("Vendido")) {
+                    System.out.println("Fila " + (f + 1) + ", Columna " + (c + 1));
+                    hayVendidos = true;
                 }
             }
-            break;
+        }
 
-        case "2": // Cambiar tarifa
-            System.out.print("Ingrese nueva tarifa (Estudiante o General): ");
-            String nuevaTarifa = scanner.nextLine();
-            if (!nuevaTarifa.equalsIgnoreCase("Estudiante") && !nuevaTarifa.equalsIgnoreCase("General")) {
-                System.out.println("Tarifa invalida, no se realizaron cambios.");
+        if (!hayVendidos) {
+            System.out.println("No hay entradas vendidas de este tipo.");
+            return;
+        }
+
+        // Pedir fila y columna a eliminar
+        int filaEliminar = 0, colEliminar = 0;
+        try {
+            System.out.print("Ingrese fila del asiento a eliminar: ");
+            filaEliminar = Integer.parseInt(scanner.nextLine()) - 1;
+            System.out.print("Ingrese columna del asiento a eliminar: ");
+            colEliminar = Integer.parseInt(scanner.nextLine()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Debe ingresar numeros validos.");
+            return;
+        }
+
+        if (filaEliminar < 0 || filaEliminar >= 5 || colEliminar < 0 || colEliminar >= 5) {
+            System.out.println("Fila o columna invalida.");
+            return;
+        }
+
+        if (!asientos[filaEliminar][colEliminar].getEstado().equals("Vendido")) {
+            System.out.println("El asiento seleccionado no esta vendido.");
+            return;
+        }
+
+        // 1. Buscar la Venta correspondiente usando el asiento (que es único)
+        Venta ventaEliminar = null;
+        if (!eventos.isEmpty()) {
+            Evento evento = eventos.get(0); // Asumiendo un solo evento
+            for (Venta v : evento.ventas) {
+                if (v.asiento == asientos[filaEliminar][colEliminar]) {
+                    ventaEliminar = v;
+                    break;
+                }
+            }
+        }
+
+        if (ventaEliminar != null) {
+            final int idParaEliminar = ventaEliminar.idVenta;
+
+            // 2. Usar el idVenta para eliminar de forma segura la Entrada correcta
+            boolean removed = EntradasVendidas.removeIf(entrada -> entrada.getIdVenta() == idParaEliminar);
+
+            if (removed) {
+                TotalEntradasVendidas--;
+                TotalIngresos -= ventaEliminar.total;
+            }
+
+            // 3. Eliminar los otros registros asociados a la venta
+            ventasPorId.remove(idParaEliminar);
+            if (!eventos.isEmpty()) {
+                eventos.get(0).eliminarVenta(ventaEliminar);
+            }
+            clientes.remove(ventaEliminar.cliente);
+
+            // 4. Liberar el asiento
+            asientos[filaEliminar][colEliminar].setEstado("Disponible");
+            System.out.println("Entrada eliminada y asiento liberado correctamente.");
+
+        } else {
+            System.out.println("Error critico: No se encontró una venta asociada a este asiento, pero estaba marcado como vendido.");
+        }
+    }
+
+    public static void editarEntrada(Scanner scanner) {
+        if (EntradasVendidas.isEmpty()) {
+            System.out.println("No hay entradas para editar.");
+            return;
+        }
+
+        System.out.println("\n--- Entradas disponibles para editar ---");
+        for (int i = 0; i < EntradasVendidas.size(); i++) {
+            Entrada e = EntradasVendidas.get(i);
+            // Mostrar el ID ayuda a diferenciar ventas de clientes con el mismo nombre
+            System.out.println((i + 1) + ". ID Venta: " + e.getIdVenta() + ", Cliente: " + e.getClienteNombre() + ", Tipo: " + e.getTipoEntrada() + ", Total: $" + (int) e.total);
+        }
+
+        System.out.print("Seleccione el numero de la entrada a editar: ");
+        int index;
+        try {
+            index = Integer.parseInt(scanner.nextLine()) - 1;
+            if (index < 0 || index >= EntradasVendidas.size()) {
+                System.out.println("Entrada invalida.");
                 return;
             }
-            entrada.tipoTarifa = nuevaTarifa;
-            venta.descuento = (nuevaTarifa.equalsIgnoreCase("Estudiante") ? entrada.total * 0.10 : 0);
-            venta.total = entrada.total - venta.descuento;
-            System.out.println("Tarifa modificada correctamente.");
-            break;
+        } catch (NumberFormatException e) {
+            System.out.println("Debe ingresar un numero valido.");
+            return;
+        }
 
-        case "3": // Cambiar edad
-            System.out.print("Ingrese nueva edad: ");
-            try {
-                int nuevaEdad = Integer.parseInt(scanner.nextLine());
-                if (nuevaEdad <= 0 || nuevaEdad > 150) {
-                    System.out.println("Edad invalida.");
+        Entrada entradaSeleccionada = EntradasVendidas.get(index);
+
+        // Buscar la venta directamente por su ID único. Esto es mucho más seguro y eficiente.
+        Venta venta = ventasPorId.get(entradaSeleccionada.getIdVenta());
+
+        if (venta == null) {
+            System.out.println("Error: No se encontró la venta asociada (ID: " + entradaSeleccionada.getIdVenta() + ").");
+            return;
+        }
+
+        Asiento asientoActual = venta.asiento;
+        Asiento[][] asientos = asientosPorTipo.get(entradaSeleccionada.getTipoEntrada());
+
+        // Opciones de edicion
+        System.out.println("\nSeleccione que desea modificar:");
+        System.out.println("1. Asiento");
+        System.out.println("2. Tarifa");
+        System.out.println("3. Edad");
+        System.out.print("Opcion: ");
+        String opcion = scanner.nextLine();
+
+        switch (opcion) {
+            case "1":
+                mostrarAsientos(asientos);
+                int fila = -1, col = -1;
+                boolean valido = false;
+                while (!valido) {
+                    try {
+                        System.out.print("Fila (1-5): ");
+                        fila = Integer.parseInt(scanner.nextLine()) - 1;
+                        System.out.print("Columna (1-5): ");
+                        col = Integer.parseInt(scanner.nextLine()) - 1;
+
+                        if (fila < 0 || fila >= 5 || col < 0 || col >= 5) {
+                            System.out.println("Fila o columna invalida.");
+                            continue;
+                        }
+
+                        if (asientos[fila][col].getEstado().equals("Disponible")) {
+                            valido = true;
+                            // Liberar asiento antiguo
+                            asientoActual.setEstado("Disponible");
+                            // Reservar asiento nuevo
+                            asientos[fila][col].setEstado("Vendido");
+                            venta.asiento = asientos[fila][col];
+                            System.out.println("Asiento modificado correctamente.");
+                        } else {
+                            System.out.println("Asiento ocupado, elija otro.");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Debe ingresar numeros validos.");
+                    }
+                }
+                break;
+
+            case "2": // Cambiar tarifa
+                System.out.print("Ingrese nueva tarifa (Estudiante o General): ");
+                String nuevaTarifa = scanner.nextLine();
+                if (!nuevaTarifa.equalsIgnoreCase("Estudiante") && !nuevaTarifa.equalsIgnoreCase("General")) {
+                    System.out.println("Tarifa invalida, no se realizaron cambios.");
                     return;
                 }
-                entrada.edad = nuevaEdad;
-                // Recalcular descuento si aplica tercera edad
-                if (nuevaEdad >= 60) {
-                    venta.descuento = entrada.total * 0.15;
-                    venta.total = entrada.total - venta.descuento;
-                }
-                System.out.println("Edad modificada correctamente.");
-            } catch (NumberFormatException e) {
-                System.out.println("Debe ingresar un numero valido.");
-            }
-            break;
+                entradaSeleccionada.tipoTarifa = nuevaTarifa;
+                venta.cliente.tipoTarifa = nuevaTarifa;
+                // NOTA: Un recálculo completo de precios y descuentos sería más complejo y no se implementa aquí para simplificar.
+                System.out.println("Tarifa modificada correctamente. (Precios/descuentos no recalculados)");
+                break;
 
-        default:
-            System.out.println("Opcion invalida.");
+            case "3": // Cambiar edad
+                System.out.print("Ingrese nueva edad: ");
+                try {
+                    int nuevaEdad = Integer.parseInt(scanner.nextLine());
+                    if (nuevaEdad <= 0 || nuevaEdad > 150) {
+                        System.out.println("Edad invalida.");
+                        return;
+                    }
+                    entradaSeleccionada.edad = nuevaEdad;
+                    venta.cliente.edad = nuevaEdad;
+                    // NOTA: Un recálculo completo de descuentos por edad no se implementa aquí para simplificar.
+                    System.out.println("Edad modificada correctamente. (Descuentos no recalculados)");
+                } catch (NumberFormatException e) {
+                    System.out.println("Debe ingresar un numero valido.");
+                }
+                break;
+
+            default:
+                System.out.println("Opcion invalida.");
+        }
     }
 }
-}
 
-        // Class para almacenar informacion
-        class Entrada {
+// Class para almacenar informacion
+class Entrada {
+    private final int idVenta;
     private String tipoEntrada;
     public String tipoTarifa;
     public int edad;
@@ -646,7 +645,8 @@ if (asientos == null) {
     double total;
     private String clienteNombre;
 
-    public Entrada(String tipoEntrada, String tipoTarifa, int edad, int precio, double descuento, double total, String clienteNombre) {
+    public Entrada(int idVenta, String tipoEntrada, String tipoTarifa, int edad, int precio, double descuento, double total, String clienteNombre) {
+        this.idVenta = idVenta;
         this.tipoEntrada = tipoEntrada;
         this.tipoTarifa = tipoTarifa;
         this.edad = edad;
@@ -656,20 +656,37 @@ if (asientos == null) {
         this.clienteNombre = clienteNombre;
     }
 
-    public String getClienteNombre() { return clienteNombre; }
-    public String getTipoEntrada() { return tipoEntrada; }
-    public String getTipoTarifa() { return tipoTarifa; }
-    public int getEdad() { return edad; }
+    // Getters
+    public int getIdVenta() {
+        return idVenta;
+    }
+
+    public String getClienteNombre() {
+        return clienteNombre;
+    }
+
+    public String getTipoEntrada() {
+        return tipoEntrada;
+    }
+
+    public String getTipoTarifa() {
+        return tipoTarifa;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
 
     @Override
     public String toString() {
         return "Entrada{" +
-                "tipoEntrada='" + tipoEntrada + '\'' +
+                "idVenta=" + idVenta +
+                ", tipoEntrada='" + tipoEntrada + '\'' +
                 ", tipoTarifa='" + tipoTarifa + '\'' +
                 ", edad=" + edad +
                 ", precio=" + precio +
-                ", descuento=" + (int)descuento +
-                ", total=" + (int)total +
+                ", descuento=" + (int) descuento +
+                ", total=" + (int) total +
                 '}';
     }
 }
@@ -686,12 +703,23 @@ class Asiento {
         this.estado = estado;
     }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public String getEstado() {
+        return estado;
+    }
 
-    public int getFila() { return fila; }
-    public int getColumna() { return columna; }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public int getFila() {
+        return fila;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
 }
+
 class Cliente {
     String nombre;
     int edad;
@@ -743,5 +771,3 @@ class Evento {
         return false;
     }
 }
-
-
