@@ -14,16 +14,14 @@ public class TeatroMoro {
     // Todos mis arraylist y hashmaps van aqui
     static ArrayList<Entrada> EntradasVendidas = new ArrayList<>();
     static HashMap<String, Asiento[][]> asientosPorTipo = new HashMap<>();
-
     static int siguienteIdVenta = 1;
     static ArrayList<Evento> eventos = new ArrayList<>();
     static HashMap<Integer, Venta> ventasPorId = new HashMap<>();
     static ArrayList<Cliente> clientes = new ArrayList<>();
-
     static int TotalEntradasVendidas = 0;
     static double TotalIngresos = 0;
 
-
+            // comienzo del programa
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean salir = false;
@@ -84,8 +82,8 @@ public class TeatroMoro {
 
         ArrayList<Entrada> entradasTemporal = new ArrayList<>();
         ArrayList<Asiento> asientosReservados = new ArrayList<>();
-
-        for (int i = 0; i < cantidad; i++) {
+            // bucle que comienza en caso de que se quiera comprar mas de una entrada
+        for (int i = 0; i < cantidad; i++) {     
             System.out.println("\n--- Entrada " + (i + 1) + " ---");
             String tipoEntrada = "";
             String tipoTarifa = "";
@@ -93,7 +91,7 @@ public class TeatroMoro {
             int precio = 0;
             boolean datosCorrectos = false;
 
-            while (!datosCorrectos) {
+            while (!datosCorrectos) {  //Obliga al usuario a quedarse aqui hasta que los datos sean ingresados correctamente
                 System.out.print("Ingrese tipo de entrada (VIP, Platea baja, Platea alta, Palcos): ");
                 tipoEntrada = scanner.nextLine();
                 System.out.print("Ingrese tarifa (Estudiante, General): ");
@@ -111,12 +109,12 @@ public class TeatroMoro {
                         System.out.println("Edad invalida.");
                         continue;
                     }
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {  //Error catcher por si ingresan letras en lugar de numeros
                     System.out.println("Debe ingresar un numero.");
                     continue;
                 }
 
-                switch (tipoEntrada.toLowerCase()) {
+                switch (tipoEntrada.toLowerCase()) {  //Lista de precios
                     case "vip" -> precio = tipoTarifa.equalsIgnoreCase("Estudiante") ? 20000 : 35000;
                     case "platea baja" -> precio = tipoTarifa.equalsIgnoreCase("Estudiante") ? 15000 : 25000;
                     case "platea alta" -> precio = tipoTarifa.equalsIgnoreCase("Estudiante") ? 10000 : 15000;
@@ -139,13 +137,13 @@ public class TeatroMoro {
                     break;
                 }
             }
-
+                //Resetea el loop si es que la entrada no es valida
             if (asientos == null) {
                 System.out.println("Tipo de entrada invalido.");
                 continue;
             }
 
-            mostrarAsientos(asientos);
+            mostrarAsientos(asientos);  //Llamamos a la visualizacion de los asientos
 
             boolean asientoValido = false;
             int filaSeleccionada = 0, columnaSeleccionada = 0;
@@ -180,12 +178,12 @@ public class TeatroMoro {
             String mensajeDescuento = "";
             ArrayList<String> descuentosPosibles = new ArrayList<>();
 
-            System.out.print("Ingrese su genero (M/F/No aplica): ");
+            System.out.print("Ingrese su genero (H/M/No aplica): ");
             String genero = scanner.nextLine();
 
             // Detectar descuentos posibles
             if (edad < 12) descuentosPosibles.add("Nino 5%");
-            if (genero.equalsIgnoreCase("F")) descuentosPosibles.add("Mujer 7%");
+            if (genero.equalsIgnoreCase("M")) descuentosPosibles.add("Mujer 7%");
             if (tipoTarifa.equalsIgnoreCase("Estudiante")) descuentosPosibles.add("Estudiante 25%");
             if (edad >= 60) descuentosPosibles.add("Tercera edad 30%");
 
@@ -203,7 +201,7 @@ public class TeatroMoro {
                     default -> 0;
                 };
             } else {
-                System.out.println("Usted califica para varios descuentos:");
+                System.out.println("Usted califica para varios descuentos:");  //En caso de que califica para varios descuentos
                 for (int e = 0; e < descuentosPosibles.size(); e++) {
                     System.out.println((e + 1) + ". " + descuentosPosibles.get(e));
                 }
@@ -213,7 +211,7 @@ public class TeatroMoro {
                 try {
                     opcionDescuento = Integer.parseInt(scanner.nextLine()) - 1;
                     if (opcionDescuento < 0 || opcionDescuento >= descuentosPosibles.size()) {
-                        System.out.println("Opción invalida. Se aplicara el primer descuento.");
+                        System.out.println("Opcion invalida. Se aplicara el primer descuento.");
                         opcionDescuento = 0;
                     }
                 } catch (NumberFormatException e) {
@@ -230,13 +228,13 @@ public class TeatroMoro {
                     default -> 0;
                 };
             }
-            System.out.print("Ingrese su nombre: ");
+            System.out.print("Ingrese su nombre: ");  
             String nombreCliente = scanner.nextLine();
 
             double totalPagar = precio - descuento;
             System.out.println("Descuento aplicado: " + mensajeDescuento);
             System.out.println("Total a pagar: $" + (int) totalPagar);
-
+                // "boleta" Visual para que el usuario vea que esta comprando
             System.out.println("\n===== BOLETA TEATRO MORO =====");
             System.out.println("Cliente: " + nombreCliente);
             System.out.println("Tipo de entrada: " + tipoEntrada);
@@ -246,15 +244,15 @@ public class TeatroMoro {
             System.out.println("Total a pagar: $" + (int) totalPagar);
             System.out.println("===============================");
 
-            // --- LÓGICA CORREGIDA ---
-            // Siempre creamos un nuevo cliente para cada entrada, garantizando que cada venta sea única.
+            // Creacion de nuevo cliente para cada entrada, anteriormente no existia esta opcion
             Cliente cliente = new Cliente(nombreCliente, edad, tipoTarifa);
             clientes.add(cliente);
-
+            
+            // Generacion de numero unico por venta, empieza en 1 y va para arriba
             int idVenta = siguienteIdVenta++;
             Asiento asientoSeleccionado = asientos[filaSeleccionada][columnaSeleccionada];
 
-            // Crear la venta con su cliente y asiento únicos
+            // Se crea la venta con el ID unico
             Venta venta = new Venta(idVenta, cliente, asientoSeleccionado, precio, descuento, totalPagar);
             ventasPorId.put(idVenta, venta);
 
@@ -265,7 +263,7 @@ public class TeatroMoro {
             Evento evento = eventos.get(0);
             evento.ventas.add(venta);
 
-            // Guardar entrada, pasando el idVenta único.
+            // Guardar entrada, esto lo guarda en el "carrito de compras" temporal
             Entrada entrada = new Entrada(idVenta, tipoEntrada, tipoTarifa, edad, precio, descuento, totalPagar, nombreCliente);
             entradasTemporal.add(entrada);
 
@@ -439,7 +437,7 @@ public class TeatroMoro {
             return;
         }
 
-        // Mostrar solo los asientos vendidos para facilitar la selección
+        // Mostrar solo los asientos vendidos para facilitar la seleccion
         System.out.println("\nAsientos vendidos de tipo " + tipoEntrada + ":");
         boolean hayVendidos = false;
         for (int f = 0; f < asientos.length; f++) {
@@ -478,10 +476,10 @@ public class TeatroMoro {
             return;
         }
 
-        // 1. Buscar la Venta correspondiente usando el asiento (que es único)
+        // Buscador de la venta
         Venta ventaEliminar = null;
         if (!eventos.isEmpty()) {
-            Evento evento = eventos.get(0); // Asumiendo un solo evento
+            Evento evento = eventos.get(0); 
             for (Venta v : evento.ventas) {
                 if (v.asiento == asientos[filaEliminar][colEliminar]) {
                     ventaEliminar = v;
@@ -493,27 +491,26 @@ public class TeatroMoro {
         if (ventaEliminar != null) {
             final int idParaEliminar = ventaEliminar.idVenta;
 
-            // 2. Usar el idVenta para eliminar de forma segura la Entrada correcta
+            // Uso el ID de venta para buscar la entrada a eliminar
             boolean removed = EntradasVendidas.removeIf(entrada -> entrada.getIdVenta() == idParaEliminar);
 
             if (removed) {
                 TotalEntradasVendidas--;
                 TotalIngresos -= ventaEliminar.total;
             }
-
-            // 3. Eliminar los otros registros asociados a la venta
+            // Eliminamos la venta del HashMap, de la lista de eventos y al cliente
             ventasPorId.remove(idParaEliminar);
             if (!eventos.isEmpty()) {
                 eventos.get(0).eliminarVenta(ventaEliminar);
             }
             clientes.remove(ventaEliminar.cliente);
 
-            // 4. Liberar el asiento
+            // Se libera el asiento
             asientos[filaEliminar][colEliminar].setEstado("Disponible");
             System.out.println("Entrada eliminada y asiento liberado correctamente.");
 
         } else {
-            System.out.println("Error critico: No se encontró una venta asociada a este asiento, pero estaba marcado como vendido.");
+            System.out.println("Error critico: No se encontro una venta asociada a este asiento, pero estaba marcado como vendido.");
         }
     }
 
@@ -545,11 +542,11 @@ public class TeatroMoro {
 
         Entrada entradaSeleccionada = EntradasVendidas.get(index);
 
-        // Buscar la venta directamente por su ID único. Esto es mucho más seguro y eficiente.
+        // Buscar la venta directamente por su ID unico
         Venta venta = ventasPorId.get(entradaSeleccionada.getIdVenta());
 
         if (venta == null) {
-            System.out.println("Error: No se encontró la venta asociada (ID: " + entradaSeleccionada.getIdVenta() + ").");
+            System.out.println("Error: No se encontro la venta asociada (ID: " + entradaSeleccionada.getIdVenta() + ").");
             return;
         }
 
@@ -607,7 +604,7 @@ public class TeatroMoro {
                 }
                 entradaSeleccionada.tipoTarifa = nuevaTarifa;
                 venta.cliente.tipoTarifa = nuevaTarifa;
-                // NOTA: Un recálculo completo de precios y descuentos sería más complejo y no se implementa aquí para simplificar.
+                // No hay recalculo de descuentos.
                 System.out.println("Tarifa modificada correctamente. (Precios/descuentos no recalculados)");
                 break;
 
@@ -621,7 +618,7 @@ public class TeatroMoro {
                     }
                     entradaSeleccionada.edad = nuevaEdad;
                     venta.cliente.edad = nuevaEdad;
-                    // NOTA: Un recálculo completo de descuentos por edad no se implementa aquí para simplificar.
+                    // No hay recalculo de descuento
                     System.out.println("Edad modificada correctamente. (Descuentos no recalculados)");
                 } catch (NumberFormatException e) {
                     System.out.println("Debe ingresar un numero valido.");
@@ -656,7 +653,6 @@ class Entrada {
         this.clienteNombre = clienteNombre;
     }
 
-    // Getters
     public int getIdVenta() {
         return idVenta;
     }
